@@ -1,6 +1,6 @@
 # Unslider::Rails
 
-Adds [Unslider](http://http://unslider.com/) jQuery plugin on Rails's asset pipeline 
+Adds [Unslider](http://unslider.com/) jQuery plugin on Rails's asset pipeline 
 
 ## Installation
 
