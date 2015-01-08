@@ -18,10 +18,10 @@
 			pause: !f,      // pause on hover (boolean)
 			loop: !f,       // infinitely looping (boolean)
 			keys: f,        // keyboard shortcuts (boolean)
-			dots: f,        // display ••••o• pagination (boolean)
+			dots: f,        // display dots pagination (boolean)
 			arrows: f,      // display prev/next arrows (boolean)
-			prev: '←',      // text or html inside prev button (string)
-			next: '→',      // same as for prev option
+			prev: '&larr;', // text or html inside prev button (string)
+			next: '&rarr;', // same as for prev option
 			fluid: f,       // is it a percentage width? (boolean)
 			starting: f,    // invoke before animation (function with argument)
 			complete: f,    // invoke after animation (function with argument)
@@ -63,7 +63,11 @@
 
 			//  Set the relative widths
 			ul.css({position: 'relative', left: 0, width: (len * 100) + '%'});
-			li.css({'float': 'left', width: (_.max[0]) + 'px'});
+			if(o.fluid) {
+				li.css({'float': 'left', width: (100 / len) + '%'});
+			} else {
+				li.css({'float': 'left', width: (_.max[0]) + 'px'});
+			}
 
 			//  Autoslide
 			o.autoplay && setTimeout(function() {
@@ -111,14 +115,34 @@
 						ul.css(styl);
 						styl['width'] = Math.min(Math.round((width / el.parent().width()) * 100), 100) + '%';
 						el.css(styl);
+						li.css({ width: width + 'px' });
 					}, 50);
 				}).resize();
 			};
 
-			//  Swipe support
-			if ($.event.special['swipe'] || $.Event('swipe')) {
-				el.on('swipeleft swiperight swipeLeft swipeRight', function(e) {
-					e.type.toLowerCase() == 'swipeleft' ? _.next() : _.prev();
+			//  Move support
+			if ($.event.special['move'] || $.Event('move')) {
+				el.on('movestart', function(e) {
+					if ((e.distX > e.distY && e.distX < -e.distY) || (e.distX < e.distY && e.distX > -e.distY)) {
+						e.preventDefault();
+					}else{
+						el.data("left", _.ul.offset().left / el.width() * 100);
+					}
+				}).on('move', function(e) {
+					var left = 100 * e.distX / el.width();
+				        var leftDelta = 100 * e.deltaX / el.width();
+					_.ul[0].style.left = parseInt(_.ul[0].style.left.replace("%", ""))+leftDelta+"%";
+
+					_.ul.data("left", left);
+				}).on('moveend', function(e) {
+					var left = _.ul.data("left");
+					if (Math.abs(left) > 30){
+						var i = left > 0 ? _.i-1 : _.i+1;
+						if (i < 0 || i >= len) i = _.i;
+						_.to(i);
+					}else{
+						_.to(_.i);
+					}
 				});
 			};
 
