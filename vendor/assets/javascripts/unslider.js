@@ -109,13 +109,17 @@
 					_.r && clearTimeout(_.r);
 
 					_.r = setTimeout(function() {
-						var styl = {height: li.eq(_.i).outerHeight()},
+						var styl = {},
 							width = el.outerWidth();
 
 						ul.css(styl);
 						styl['width'] = Math.min(Math.round((width / el.parent().width()) * 100), 100) + '%';
 						el.css(styl);
 						li.css({ width: width + 'px' });
+                                                
+                                                styl['height'] = li.eq(_.i).outerHeight();
+                                                ul.css(styl);
+                                                el.css(styl);
 					}, 50);
 				}).resize();
 			};
